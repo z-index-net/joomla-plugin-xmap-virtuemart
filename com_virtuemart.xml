@@ -20,6 +20,9 @@
         <language tag="nl-NL">nl-NL/nl-NL.plg_xmap_com_virtuemart.ini</language>
         <language tag="ru-RU">ru-RU/ru-RU.plg_xmap_com_virtuemart.ini</language>
     </languages>
+    <updateservers>
+        <server type="collection" priority="1" name="z-index development">http://www.z-index.net/en/extensions.xml</server>
+    </updateservers>
     <config>
         <fields name="params">
             <fieldset name="basic">
