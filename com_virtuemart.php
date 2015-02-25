@@ -15,12 +15,13 @@ class xmap_com_virtuemart
     protected static $productModel;
     protected static $initialized = false;
 
-    static $urlBase;
+    public static $urlBase;
 
-    static function prepareMenuItem($node, &$params)
+    public static function prepareMenuItem($node, &$params)
     {
         $app = JFactory::getApplication();
 
+        // TODO new JUri
         $link_query = parse_url($node->link);
 
         parse_str(html_entity_decode($link_query['query']), $link_vars);
@@ -50,7 +51,7 @@ class xmap_com_virtuemart
     }
 
     /** Get the content tree for this kind of content */
-    static function getTree($xmap, $parent, &$params)
+    public static function getTree($xmap, $parent, &$params)
     {
         self::initialize();
 
@@ -109,16 +110,15 @@ class xmap_com_virtuemart
         $params['prod_priority'] = $priority;
         $params['prod_changefreq'] = $changefreq;
 
-        xmap_com_virtuemart::getCategoryTree($xmap, $parent, $params, $catid);
+        self::getCategoryTree($xmap, $parent, $params, $catid);
 
         return true;
     }
 
     /** Virtuemart support */
-    static function getCategoryTree($xmap, $parent, &$params, $catid = 0)
+    public static function getCategoryTree($xmap, $parent, &$params, $catid = 0)
     {
-        $database = JFactory::getDBO();
-
+        // TODO refactor
         if (!isset($urlBase)) {
             $urlBase = JURI::base();
         }
@@ -142,7 +142,7 @@ class xmap_com_virtuemart
             $node->link = 'index.php?option=com_virtuemart&amp;view=category&amp;virtuemart_category_id=' . $row->virtuemart_category_id . '&amp;Itemid=' . $parent->id;
 
             if ($xmap->printNode($node) !== FALSE) {
-                xmap_com_virtuemart::getCategoryTree($xmap, $parent, $params, $row->virtuemart_category_id);
+                self::getCategoryTree($xmap, $parent, $params, $row->virtuemart_category_id);
             }
         }
 
@@ -191,7 +191,7 @@ class xmap_com_virtuemart
         }
     }
 
-    static protected function initialize()
+    protected static function initialize()
     {
         if (self::$initialized) return;
 
