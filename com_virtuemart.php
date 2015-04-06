@@ -112,6 +112,7 @@ class xmap_com_virtuemart
 
         $params['include_products'] = $include_products;
 
+        // TODO make it configurable
         $params['include_product_images'] = (JArrayHelper::getValue($params, 'include_product_images', 1) && $xmap->view == 'xml');
         $params['product_image_license_url'] = trim(JArrayHelper::getValue($params, 'product_image_license_url', ''));
 

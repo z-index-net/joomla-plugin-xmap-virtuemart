@@ -8,7 +8,7 @@
     <authorEmail>guille@vargas.co.cr</authorEmail>
     <authorUrl>joomla.vargas.co.cr</authorUrl>
     <version>@REVISION@</version>
-    <description>PLG_XMAP_COM_VIRTUEMART_PLUGIN_DESCRIPTION</description>
+    <description>PLG_XMAP_COM_VIRTUEMART_DESC</description>
     <files>
         <filename plugin="com_virtuemart">com_virtuemart.php</filename>
     </files>
@@ -36,8 +36,6 @@
                     <option value="2">PLG_XMAP_COM_VIRTUEMART_OPTION_XML_ONLY</option>
                     <option value="3">PLG_XMAP_COM_VIRTUEMART_OPTION_HTML_ONLY</option>
                 </field>
-            </fieldset>
-            <fieldset name="xml" label="PLG_XMAP_COM_VIRTUEMART_FIELDSET_XML_LABEL">
                 <field name="cat_priority" type="list" default="-1" label="PLG_XMAP_COM_VIRTUEMART_CATEGORY_PRIORITY_LABEL" description="PLG_XMAP_COM_VIRTUEMART_CATEGORY_PRIORITY_DESC">
                     <option value="-1">PLG_XMAP_COM_VIRTUEMART_OPTION_USE_PARENT_MENU</option>
                     <option value="0.0">0.0</option>
