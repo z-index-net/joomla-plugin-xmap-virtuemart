@@ -1,23 +1,45 @@
 <?php
 
 /**
- * @author     Guillermo Vargas <guille@vargas.co.cr>
- * @author     Branko Wilhelm <branko.wilhelm@gmail.com>
- * @link       http://www.z-index.net
- * @license    GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @author      Guillermo Vargas <guille@vargas.co.cr>
+ * @author      Branko Wilhelm <branko.wilhelm@gmail.com>
+ * @link        http://www.z-index.net
+ * @copyright   (c) 2005 - 2009 Joomla! Vargas. All rights reserved.
+ * @copyright   (c) 2015 Branko Wilhelm. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 
 class xmap_com_virtuemart
 {
+    /**
+     * @var VirtueMartModelCategory
+     */
     protected static $categoryModel;
+
+    /**
+     * @var VirtueMartModelProduct
+     */
     protected static $productModel;
+
+    /**
+     * @var bool
+     */
     protected static $initialized = false;
 
+    /**
+     * @var string
+     */
     public static $urlBase;
 
-    public static function prepareMenuItem($node, &$params)
+    /**
+     * @param stdClass $node
+     * @param array $params
+     *
+     * @throws Exception
+     */
+    public static function prepareMenuItem($node, array &$params)
     {
         $app = JFactory::getApplication();
 
@@ -29,29 +51,40 @@ class xmap_com_virtuemart
         $catid = JArrayHelper::getValue($link_vars, 'virtuemart_category_id', 0);
         $prodid = JArrayHelper::getValue($link_vars, 'virtuemart_product_id', 0);
 
-        if (!$catid) {
+        if (!$catid)
+        {
             $menu = $app->getMenu();
             $menuParams = $menu->getParams($node->id);
             $catid = $menuParams->get('virtuemart_category_id', 0);
         }
 
-        if (!$prodid) {
+        if (!$prodid)
+        {
             $menu = $app->getMenu();
             $menuParams = $menu->getParams($node->id);
             $prodid = $menuParams->get('virtuemart_product_id', 0);
         }
 
-        if ($prodid && $catid) {
+        if ($prodid && $catid)
+        {
             $node->uid = 'com_virtuemartc' . $catid . 'p' . $prodid;
             $node->expandible = false;
-        } elseif ($catid) {
+        } elseif ($catid)
+        {
             $node->uid = 'com_virtuemartc' . $catid;
             $node->expandible = true;
         }
     }
 
-    /** Get the content tree for this kind of content */
-    public static function getTree($xmap, $parent, &$params)
+    /**
+     * @param XmapDisplayerInterface $xmap
+     * @param stdClass $parent
+     * @param array $params
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public static function getTree($xmap, stdClass $parent, array &$params)
     {
         self::initialize();
 
@@ -69,27 +102,29 @@ class xmap_com_virtuemart
         $view = JArrayHelper::getValue($link_vars, 'view', '');
 
         // we currently support only categories
-        if (!in_array($view, array('categories', 'category'))) {
+        if (!in_array($view, array('categories', 'category')))
+        {
             return true;
         }
 
         $include_products = JArrayHelper::getValue($params, 'include_products', 1);
-        $include_products = ($include_products == 1
-            || ($include_products == 2 && $xmap->view == 'xml')
-            || ($include_products == 3 && $xmap->view == 'html'));
+        $include_products = ($include_products == 1 || ($include_products == 2 && $xmap->view == 'xml') || ($include_products == 3 && $xmap->view == 'html'));
 
         $params['include_products'] = $include_products;
+
         $params['include_product_images'] = (JArrayHelper::getValue($params, 'include_product_images', 1) && $xmap->view == 'xml');
         $params['product_image_license_url'] = trim(JArrayHelper::getValue($params, 'product_image_license_url', ''));
 
         $priority = JArrayHelper::getValue($params, 'cat_priority', $parent->priority);
         $changefreq = JArrayHelper::getValue($params, 'cat_changefreq', $parent->changefreq);
 
-        if ($priority == '-1') {
+        if ($priority == '-1')
+        {
             $priority = $parent->priority;
         }
 
-        if ($changefreq == '-1') {
+        if ($changefreq == '-1')
+        {
             $changefreq = $parent->changefreq;
         }
 
@@ -99,11 +134,13 @@ class xmap_com_virtuemart
         $priority = JArrayHelper::getValue($params, 'prod_priority', $parent->priority);
         $changefreq = JArrayHelper::getValue($params, 'prod_changefreq', $parent->changefreq);
 
-        if ($priority == '-1') {
+        if ($priority == '-1')
+        {
             $priority = $parent->priority;
         }
 
-        if ($changefreq == '-1') {
+        if ($changefreq == '-1')
+        {
             $changefreq = $parent->changefreq;
         }
 
@@ -111,15 +148,19 @@ class xmap_com_virtuemart
         $params['prod_changefreq'] = $changefreq;
 
         self::getCategoryTree($xmap, $parent, $params, $catid);
-
-        return true;
     }
 
-    /** Virtuemart support */
-    public static function getCategoryTree($xmap, $parent, &$params, $catid = 0)
+    /**
+     * @param XmapDisplayerInterface $xmap
+     * @param stdCLass $parent
+     * @param array $params
+     * @param int $catid
+     */
+    public static function getCategoryTree($xmap, stdClass $parent, array &$params, $catid = 0)
     {
         // TODO refactor
-        if (!isset($urlBase)) {
+        if (!isset($urlBase))
+        {
             $urlBase = JURI::base();
         }
 
@@ -129,7 +170,8 @@ class xmap_com_virtuemart
 
         $xmap->changeLevel(1);
 
-        foreach ($children as $row) {
+        foreach ($children as $row)
+        {
             $node = new stdclass;
 
             $node->id = $parent->id;
@@ -141,23 +183,27 @@ class xmap_com_virtuemart
             $node->expandible = true;
             $node->link = 'index.php?option=com_virtuemart&amp;view=category&amp;virtuemart_category_id=' . $row->virtuemart_category_id . '&amp;Itemid=' . $parent->id;
 
-            if ($xmap->printNode($node) !== FALSE) {
+            if ($xmap->printNode($node) !== false)
+            {
                 self::getCategoryTree($xmap, $parent, $params, $row->virtuemart_category_id);
             }
         }
 
         $xmap->changeLevel(-1);
 
-        if ($params['include_products'] && $catid != 0) {
+        if ($params['include_products'] && $catid != 0)
+        {
             $products = self::$productModel->getProductsInCategory($catid);
 
-            if ($params['include_product_images']) {
+            if ($params['include_product_images'])
+            {
                 self::$categoryModel->addImages($products, 1);
             }
 
             $xmap->changeLevel(1);
 
-            foreach ($products as $row) {
+            foreach ($products as $row)
+            {
                 $node = new stdclass;
 
                 $node->id = $parent->id;
@@ -170,9 +216,12 @@ class xmap_com_virtuemart
                 $node->expandible = false;
                 $node->link = 'index.php?option=com_virtuemart&amp;view=productdetails&amp;virtuemart_product_id=' . $row->virtuemart_product_id . '&amp;virtuemart_category_id=' . $row->virtuemart_category_id . '&amp;Itemid=' . $parent->id;
 
-                if ($params['include_product_images']) {
-                    foreach ($row->images as $image) {
-                        if (isset($image->file_url)) {
+                if ($params['include_product_images'])
+                {
+                    foreach ($row->images as $image)
+                    {
+                        if (isset($image->file_url))
+                        {
                             $imagenode = new stdClass;
 
                             $imagenode->src = $urlBase . $image->file_url_thumb;
@@ -191,13 +240,22 @@ class xmap_com_virtuemart
         }
     }
 
+    /**
+     * @todo refactor
+     *
+     * @throws Exception
+     */
     protected static function initialize()
     {
-        if (self::$initialized) return;
+        if (self::$initialized)
+        {
+            return;
+        }
 
         $app = JFactory::getApplication();
 
-        if (!class_exists('VmConfig')) {
+        if (!class_exists('VmConfig'))
+        {
             require(JPATH_ADMINISTRATOR . '/components/com_virtuemart/helpers/config.php');
             VmConfig::loadConfig();
         }
@@ -215,5 +273,7 @@ class xmap_com_virtuemart
 
         if (!class_exists('VirtueMartModelProduct')) require(JPATH_VM_ADMINISTRATOR . '/models/product.php');
         self::$productModel = new VirtueMartModelProduct();
+
+        self::$initialized = true;
     }
 }
