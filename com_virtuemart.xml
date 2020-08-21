@@ -25,7 +25,7 @@
         <language tag="ru-RU">ru-RU/ru-RU.plg_xmap_com_virtuemart.sys.ini</language>
     </languages>
     <updateservers>
-        <server type="collection" priority="1" name="z-index development">http://www.z-index.net/en/extensions.xml</server>
+        <server type="extension" priority="1" name="Xmap - VirtueMart Integration">https://raw.githubusercontent.com/z-index-net/joomla-plugin-xmap-virtuemart/master/updatestream.xml</server>
     </updateservers>
     <config>
         <fields name="params">
