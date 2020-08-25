@@ -9,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
-                uses: actions/checkout@v1
+                uses: actions/checkout@v2
 
             -   name: Inject slug/short variables
                 uses: rlespinasse/github-slug-action@v2.x
@@ -19,15 +19,35 @@ jobs:
                 with:
                     find: "@REVISION@"
                     replace: "${{ env.GITHUB_REF_SLUG }}"
-                    include: "./*.xml"
 
-            -   name: Archive Release
+            -   name: create zip release
                 uses: thedoctor0/zip-release@master
                 with:
                     filename: "${{ github.event.repository.name }}.zip"
                     exclusions: '*.git* /screenshots/* updatestream.xml'
 
-            -   name: Create Release
+            -   name: version bump in joomla updatestream.xml
+                uses: Mudlet/xmlstarlet-action@master
+                with:
+                    args: ed --inplace -u "/updates/update/version" -v "${{ env.GITHUB_REF_SLUG }}" updatestream.xml
+
+            -   name: commit version bump in joomla updatestream
+                uses: EndBug/add-and-commit@v4
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                with:
+                    ref: master
+                    add: updatestream.xml
+                    message: 'version bump in joomla updatestream.xml'
+
+            -   name: trigger build of extensions.xml
+                uses: peter-evans/repository-dispatch@v1
+                with:
+                    token: ${{ secrets.PAGE_ACCESS_TOKEN }}
+                    repository: z-index-net/page
+                    event-type: auto-build
+
+            -   name: create release from tag
                 id: create_release
                 uses: actions/create-release@v1
                 env:
@@ -38,7 +58,7 @@ jobs:
                     draft: false
                     prerelease: false
 
-            -   name: Upload Release Asset
+            -   name: upload release asset
                 uses: actions/upload-release-asset@v1
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
