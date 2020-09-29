@@ -44,7 +44,7 @@ jobs:
                 uses: peter-evans/repository-dispatch@v1
                 with:
                     token: ${{ secrets.PAGE_ACCESS_TOKEN }}
-                    repository: z-index-net/page
+                    repository: ${{ secrets.PAGE_REPOSITORY }}
                     event-type: auto-build
 
             -   name: create release from tag
